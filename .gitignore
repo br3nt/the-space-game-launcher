@@ -1,0 +1,4 @@
+storage/**/*.swf
+storage/**/*.zip
+shots/*-raw.png
+.DS_Store
