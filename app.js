@@ -212,8 +212,8 @@
     try {
       await player.ruffle().load({
         url: STORAGE + g.loader,
-        // The widget talks HTTP only (through the service worker); it needs neither page script access nor browser navigation.
-        allowNetworking: 'internal', allowScriptAccess: false, autoplay: 'on', unmuteOverlay: 'hidden', openUrlMode: 'confirm',
+        // No page script access for user-supplied SWFs. allowNetworking must stay 'all': 'internal' stalls the widget's intro.
+        allowNetworking: 'all', allowScriptAccess: false, autoplay: 'on', unmuteOverlay: 'hidden', openUrlMode: 'confirm',
         scale: 'showAll', forceScale: true, forceAlign: true, backgroundColor: '#000000', logLevel: 'warn',
         urlRewriteRules: [
           [/^https?:\/\/(widget|sessions|sessions2)\.casualcollective\.com\//, cc + 'widget.casualcollective.com/'],
