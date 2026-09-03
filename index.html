@@ -35,26 +35,26 @@
       <div class="card game">
         <h2>The Space Game</h2>
         <p>The original. Training, missions, mining modes, survival modes and the bonus modes. Version 1.07, 25th Feb 2009.</p>
-        <div class="row"><span id="ready-thespacegame" class="ready no">Checking…</span><button id="play-thespacegame" class="btn go" data-play="thespacegame" disabled>Launch</button></div>
         <ul id="files-thespacegame" class="files"></ul>
+        <ul id="files-tsgmissions" class="files"></ul>
+        <div class="row"><span id="ready-thespacegame" class="ready no">Checking…</span><button id="play-thespacegame" class="btn go" data-play="thespacegame" disabled>Launch</button></div>
       </div>
       <div class="card game">
         <h2>The Space Game<span class="orange">: Missions</span></h2>
         <p>The 2009 follow-up. An eight-mission campaign with Easy 1x, Normal 1.5x, Hard 2x and Crazy 3x multipliers, the EMP, the Super Miner and warp jumps.</p>
         <div class="row"><span id="ready-tsgmissions" class="ready no">Checking…</span><button id="play-tsgmissions" class="btn go" data-play="tsgmissions" disabled>Launch</button></div>
-        <ul id="files-tsgmissions" class="files"></ul>
       </div>
     </div>
 
     <div class="stagebox">
       <div id="stage" class="stage"></div>
-      <div class="gamebar">
-        <span id="stage-title" class="gametitle">No game running</span>
-        <label class="vol">Volume <input id="volume" type="range" min="0" max="100" value="100"></label>
-        <button id="mute" class="ccbtn">Mute</button>
-        <button id="fullscreen" class="ccbtn">Full screen</button>
+      <div id="status" class="loadbar" style="--pct:0%">
+        <span id="status-text">Loading…</span>
+        <span class="ctl">
+          <button id="mute" class="ico" title="Mute" aria-label="Mute"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 9v6h4l5 4V5L7 9H3z" fill="currentColor"/><path class="waves" d="M15 8.5a4 4 0 0 1 0 7M17.5 6a7.5 7.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="cross" d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <button id="fullscreen" class="ico" title="Full screen" aria-label="Full screen"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </span>
       </div>
-      <div id="status" class="loadbar" style="--pct:0%"><span id="status-text">Loading…</span></div>
     </div>
 
     <div class="card drop" id="drop">

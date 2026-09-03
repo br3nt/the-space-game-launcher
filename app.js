@@ -185,7 +185,6 @@
     const g = GAMES[id];
     if (!swReady) { setStatus('Service worker is not ready yet.', 100, 'error'); return; }
     showTab('play');
-    $('#stage-title').textContent = g.title;
     document.body.dataset.game = id;
     if (player) { player.remove(); player = null; }
     if (!window.RufflePlayer || !window.RufflePlayer.newest()) { setStatus('Ruffle did not load. Are you online? (Ruffle is fetched from a CDN.)', 100, 'error'); return; }
@@ -209,11 +208,9 @@
   $$('[data-play]').forEach(b => b.addEventListener('click', () => play(b.dataset.play)));
   $('#fullscreen').addEventListener('click', () => $('#stage').requestFullscreen && $('#stage').requestFullscreen());
   // Volume and mute drive Ruffle directly; the widget's own bar (bottom 25px of its stage) is clipped off by CSS.
-  const vol = $('#volume'), mute = $('#mute');
   let muted = false;
-  function applyVolume() { if (player) player.volume = muted ? 0 : vol.value / 100; mute.textContent = muted ? 'Unmute' : 'Mute'; }
-  vol.addEventListener('input', () => { muted = false; applyVolume(); });
-  mute.addEventListener('click', () => { muted = !muted; applyVolume(); });
+  function applyVolume() { if (player) player.volume = muted ? 0 : 1; document.body.classList.toggle('muted', muted); $('#mute').title = muted ? 'Unmute' : 'Mute'; }
+  $('#mute').addEventListener('click', () => { muted = !muted; applyVolume(); });
 
   // ---- go ------------------------------------------------------------------------------------
   setStatus('Checking files…', 30, 'busy');
