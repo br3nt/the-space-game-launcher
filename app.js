@@ -81,7 +81,7 @@
   async function registerSW() {
     if (location.protocol === 'file:') { setStatus('Open this page through a web server, not as a file. See "Get the files".', 100, 'error'); return; }
     if (!('serviceWorker' in navigator)) { setStatus('This browser has no service worker support.', 100, 'error'); return; }
-    await navigator.serviceWorker.register('sw.js');
+    await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
     await navigator.serviceWorker.ready;
     if (!navigator.serviceWorker.controller) {
       // First visit: the worker is installed but this page loaded before it took control. One reload fixes it.
