@@ -118,7 +118,11 @@ async function api(req, u, path) {
   if (path.endsWith('session/start')) return text('sid=1&result=1');
 
   if (path.endsWith('player/data')) {                // the game's persistent save data
-    const pd = form.get('pd') ?? q.get('pd');
+    // URLSearchParams decoded the POST layer; the game escape()s the k=v,k=v string itself before
+    // handing it to the widget, so decode once more and store it plain. Stored escaped, the game
+    // reads one giant key on the next load and the save snowballs.
+    let pd = form.get('pd') ?? q.get('pd');
+    try { pd = pd && decodeURIComponent(pd); } catch {}
     if (pd) await savePd(gid, pd);
     return text('result=1');
   }

@@ -232,11 +232,16 @@
       await player.ruffle().load({
         url: STORAGE + g.loader,
         // No page script access for user-supplied SWFs. allowNetworking must stay 'all': 'internal' stalls the widget's intro.
-        allowNetworking: 'all', allowScriptAccess: false, autoplay: 'on', unmuteOverlay: 'hidden', openUrlMode: 'confirm',
+        // Links the games open (the banners, "More games") are rewritten below to places that still exist, so they open without a prompt.
+        allowNetworking: 'all', allowScriptAccess: false, autoplay: 'on', unmuteOverlay: 'hidden', openUrlMode: 'allow',
         scale: 'showAll', forceScale: true, forceAlign: true, backgroundColor: '#000000', logLevel: 'warn',
         urlRewriteRules: [
           [/^https?:\/\/(widget|sessions|sessions2)\.casualcollective\.com\//, cc + 'widget.casualcollective.com/'],
           [/^https?:\/\/storage\.cloud\.casualcollective\.com\//, cc + 'storage.cloud.casualcollective.com/'],
+          // Missions' "play the original TSG" banner: games?id=2 was The Space Game's page. Open it here instead.
+          [/^https?:\/\/www\.casualcollective\.com\/games\?id=2(&.*)?$/, SCOPE + '#thespacegame'],
+          // Everything else on the dead site goes to the Wayback Machine's 2009 copy.
+          [/^https?:\/\/(www\.)?casualcollective\.com\//, 'https://web.archive.org/web/2009/http://www.casualcollective.com/'],
         ],
       });
     } catch (err) {
