@@ -70,6 +70,7 @@
 
   // ---- service worker --------------------------------------------------------------------------
   let swReady = false;
+  let swPromise;   // play() waits on this instead of racing a flag
   async function registerSW() {
     if (location.protocol === 'file:') { setStatus('Open this page through a web server, not as a file. See "Get the files".', 100, 'error'); return; }
     if (!('serviceWorker' in navigator)) { setStatus('This browser has no service worker support.', 100, 'error'); return; }
@@ -183,7 +184,9 @@
   let player = null;
   async function play(id) {
     const g = GAMES[id];
-    if (!swReady) { setStatus('Service worker is not ready yet.', 100, 'error'); return; }
+    setStatus('Starting…', 10, 'busy');
+    try { await swPromise; } catch {}
+    if (!swReady) { setStatus('The service worker is not running, so the game cannot be served. Reload the page.', 100, 'error'); return; }
     showTab('play');
     document.body.dataset.game = id;
     if (player) { player.remove(); player = null; }
@@ -214,7 +217,8 @@
 
   // ---- go ------------------------------------------------------------------------------------
   setStatus('Checking files…', 30, 'busy');
-  registerSW().then(async () => {
+  swPromise = registerSW();
+  swPromise.then(async () => {
     await refreshFiles();
     if (swReady) {
       const ready = Object.keys(GAMES).filter(id => !$(`#play-${id}`).disabled);
