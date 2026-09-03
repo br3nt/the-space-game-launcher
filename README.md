@@ -56,7 +56,8 @@ Pages. A static server is required either way: service workers do not run from `
 
 Files under `storage/` are converted and cached in the browser on first use, so after editing one,
 use the "clear them" link in step 2 of the page's "Get the files" tab to pick up the change. Saved progress lives in a separate
-cache and survives that.
+cache and survives that; the "Saved progress" card on the same tab shows what each game has saved and
+can clear it on its own.
 
 ## How it works
 

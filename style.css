@@ -69,6 +69,11 @@ code { color: #ffe08a; }
 .files .have .mark { border-style: solid; border-color: var(--green); background: var(--green); }
 .files .optional .mark { border-color: #666; }
 .files em { color: #666; font-style: normal; }
+.saves { list-style: none; margin: 8px 0 0; padding: 0; }
+.saves li { margin: 4px 0; }
+.saves b { color: #fff; }
+.saves .have { color: var(--green); }
+.saves .none { color: var(--dim); }
 
 .btn {
   font: 700 17px var(--body); color: #000; padding: 10px 22px; cursor: pointer; border: 1px solid #000;

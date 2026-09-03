@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%23ffc400' stroke-width='3' stroke-dasharray='4 4'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23ffc400'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=8">
 <script src="https://unpkg.com/@ruffle-rs/ruffle@0.5.0"></script>
 </head>
 <body data-tab="play">
@@ -104,6 +104,12 @@
     </div>
 
     <div class="card">
+      <h3>Saved progress</h3>
+      <p>The games save the way they did in 2009, by posting a line of player data to the server. Here that line lands in this browser, separate from the game files, so it survives clearing them and can be cleared on its own.</p>
+      <ul id="saves" class="saves"></ul>
+    </div>
+
+    <div class="card">
       <h3>Or run it locally</h3>
       <p>Clone <a href="https://github.com/br3nt/the-space-game-launcher">the repo</a>, unzip the packs, and put the SWFs under <code>storage/</code> keeping their paths, so you end up with <code>storage/games/thespacegame.swf</code>, <code>storage/zones/pub/10/widget.swf</code> and so on. Then serve the folder with any static server and open it. Service workers don't run from <code>file://</code>, so a double-click on <code>index.html</code> won't do.</p>
 <pre>git clone https://github.com/br3nt/the-space-game-launcher
@@ -174,6 +180,6 @@ open http://localhost:8000</pre>
   </footer>
 </main>
 
-<script src="app.js?v=7"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

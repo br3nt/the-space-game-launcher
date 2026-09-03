@@ -2,18 +2,19 @@
 (() => {
   const SCOPE = new URL('./', location.href).href;
   const CACHE = 'tsg-files-v1';
+  const SAVES = 'tsg-saves-v1';   // player data, kept apart from the files (sw.js writes it)
   const STORAGE = SCOPE + 'cc/storage.cloud.casualcollective.com/';
 
   // What each game needs. Paths are relative to storage.cloud.casualcollective.com, exactly as in
   // Flashpoint's data packs (content/storage.cloud.casualcollective.com/...).
   const GAMES = {
     thespacegame: {
-      title: 'The Space Game', loader: 'games/thespacegame.swf',
+      title: 'The Space Game', gid: 10, loader: 'games/thespacegame.swf',
       required: ['games/thespacegame.swf', 'zones/pub/10/widget.swf', 'zones/pub/10/thespacegame.v83.swf'],
       optional: ['zones/pub/10/thespacegamebg.swf', 'zones/pub/stingers/ccblocks.swf'],
     },
     tsgmissions: {
-      title: 'The Space Game: Missions', loader: 'games/tsgmissions.swf',
+      title: 'The Space Game: Missions', gid: 16, loader: 'games/tsgmissions.swf',
       required: ['games/tsgmissions.swf', 'zones/pub/16/widget.swf', 'zones/pub/16/tsgmissions.v16.swf'],
       optional: ['zones/pub/stingers/ccblocks.swf'],
     },
@@ -125,6 +126,27 @@
       $(`#ready-${id}`).className = 'ready ' + (ok ? 'ok' : 'no');
       $(`#check-${id}`).textContent = ok ? 'Ready' : 'Files missing';
       $(`#check-${id}`).className = 'ready ' + (ok ? 'ok' : 'no');
+    }
+  }
+
+  // Saved progress, per game: what sw.js stored from the game's player/data posts.
+  async function refreshSaves() {
+    const cache = await caches.open(SAVES);
+    const ul = $('#saves'); ul.innerHTML = '';
+    for (const [id, g] of Object.entries(GAMES)) {
+      const r = await cache.match(SCOPE + 'cc/pd/' + g.gid);
+      const pd = r ? await r.text() : '';
+      const li = document.createElement('li');
+      const name = document.createElement('b'); name.textContent = g.title;
+      const state = document.createElement('span'); state.className = pd ? 'have' : 'none';
+      state.textContent = pd ? `${pd.split(',').filter(Boolean).length} value${pd.includes(',') ? 's' : ''} saved` : 'nothing saved yet';
+      li.append(name, ' ', state);
+      if (pd) {
+        const btn = document.createElement('button'); btn.className = 'link'; btn.textContent = 'clear';
+        btn.addEventListener('click', async () => { await cache.delete(SCOPE + 'cc/pd/' + g.gid); setDropStatus(`${g.title}: saved progress cleared.`, ''); refreshSaves(); });
+        li.append(' ', btn);
+      }
+      ul.appendChild(li);
     }
   }
 
@@ -250,6 +272,7 @@
     runningTimer = setTimeout(() => setStatus(`${g.title} is running.`, 100, 'ok'), 6000);
   }
   $$('[data-play]').forEach(b => b.addEventListener('click', () => play(b.dataset.play)));
+  $$('.tab').forEach(t => t.addEventListener('click', () => { if (t.dataset.tab === 'files') refreshSaves(); }));
   $('#fullscreen').addEventListener('click', () => $('#stage').requestFullscreen && $('#stage').requestFullscreen());
   // Volume and mute drive Ruffle directly; the widget's own bar (bottom 25px of its stage) is clipped off by CSS.
   let muted = false;
@@ -260,7 +283,7 @@
   setStatus('Checking files…', 30, 'busy');
   swPromise = registerSW();
   swPromise.then(async () => {
-    await refreshFiles();
+    await refreshFiles(); await refreshSaves();
     if (swReady) {
       const ready = Object.keys(GAMES).filter(id => !$(`#play-${id}`).disabled);
       if (ready.length) setStatus('Ready. Pick a game.', 100, 'ok');
