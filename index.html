@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+<script src="https://unpkg.com/@ruffle-rs/ruffle@0.5.0"></script>
 </head>
 <body data-tab="play">
 <canvas id="stars" aria-hidden="true"></canvas>
@@ -51,7 +51,7 @@
       <div id="status" class="loadbar" style="--pct:0%">
         <span id="status-text">Loading…</span>
         <span class="ctl">
-          <button id="mute" class="ico" title="Mute" aria-label="Mute"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 9v6h4l5 4V5L7 9H3z" fill="currentColor"/><path class="waves" d="M15 8.5a4 4 0 0 1 0 7M17.5 6a7.5 7.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="cross" d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          <button id="mute" class="ico" title="Mute" aria-label="Sound" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 9v6h4l5 4V5L7 9H3z" fill="currentColor"/><path class="waves" d="M15 8.5a4 4 0 0 1 0 7M17.5 6a7.5 7.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="cross" d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
           <button id="fullscreen" class="ico" title="Full screen" aria-label="Full screen"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </span>
       </div>
@@ -113,7 +113,7 @@ open http://localhost:8000</pre>
 
     <div class="card">
       <h3>What this page does</h3>
-      <p>A <a href="https://github.com/br3nt/the-space-game-launcher/blob/main/sw.js">service worker</a> intercepts every request to the Casual Collective hostnames and answers them itself: the loader's redirect, the setup JSON (with player class 2, a member, so the members-only content is on), <code>result=1</code> for the score and level pings, and the save data round trip. The SWFs come from your browser's storage. The loader, wrapper and games run byte for byte as they shipped in 2009, in <a href="https://ruffle.rs/">Ruffle</a>.</p>
+      <p>A <a href="https://github.com/br3nt/the-space-game-launcher/blob/main/sw.js">service worker</a> intercepts every request to the Casual Collective hostnames and answers them itself: the loader's one-line config, the setup JSON (with player class 2, a member, so the members-only content is on), <code>result=1</code> for the score and level pings, and the save data round trip. The SWFs come from your browser's storage. The loader, wrapper and games run byte for byte as they shipped in 2009, in <a href="https://ruffle.rs/">Ruffle</a>.</p>
       <p>Two things cost an evening: the wrapper's preloader only proceeds when Ruffle reports every byte loaded, which needs the child SWFs stored uncompressed, and a background browser tab throttles Ruffle to a crawl, which looks like a hang.</p>
       <p>The full story is in the <a href="https://br3nt.github.io/">blog post</a>.</p>
     </div>

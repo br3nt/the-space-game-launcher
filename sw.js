@@ -7,6 +7,7 @@
 // Nothing else is intercepted.
 
 const CACHE = 'tsg-files-v1';
+const SAVES = 'tsg-saves-v1';                          // separate, so clearing game files keeps progress
 const SCOPE = self.registration.scope;                 // e.g. https://br3nt.github.io/the-space-game-launcher/
 const CC = SCOPE + 'cc/';
 const STORAGE = CC + 'storage.cloud.casualcollective.com/';
@@ -16,7 +17,7 @@ const API = CC + 'widget.casualcollective.com/';
 // Only 10 and 16 have been tested; the rest are the other Casual Collective games the same widget served.
 const GAMES = {
   10: { stem: 'thespacegame',  ver: 83, gname: 'TheSpaceGame',      splash: '/10/thespacegamebg' },
-  16: { stem: 'tsgmissions',   ver: 16, gname: 'TSGMissions',       splash: '/16/tsgmissionsbg' },
+  16: { stem: 'tsgmissions',   ver: 16, gname: 'TSGMissions',       splash: '' },   // no splash was ever archived
   2:  { stem: 'desktoparmada', ver: 26, gname: 'DesktopArmada',     splash: '/2/desktoparmadabg' },
   3:  { stem: 'buggleconnect', ver: 16, gname: 'BuggleConnect',     splash: '/3/buggleconnectbg' },
   7:  { stem: 'flashelementtd2', ver: 9, gname: 'FlashElementTD2',  splash: '/7/flashelementtd2bg' },
@@ -99,7 +100,7 @@ async function api(req, u, path) {
 
   if (path.endsWith('session/setup')) {              // widget config, same shape as Flashpoint's setup.php
     const stinger = (await exists('zones/pub/stingers/ccblocks.swf')) ? '/stingers/ccblocks.swf' : '';
-    const splash = (await exists('zones/pub' + game.splash + '.swf')) ? game.splash : '';
+    const splash = (game.splash && await exists('zones/pub' + game.splash + '.swf')) ? game.splash : '';
     const cfg = {
       result: 1, host: 'local', lr: 'cc', ss: 'http://sessions.casualcollective.com', zone: 'pub',
       wv: 1, server: '', port: 0, lobby: 'lobby', menu: '',
@@ -117,7 +118,7 @@ async function api(req, u, path) {
   if (path.endsWith('session/start')) return text('sid=1&result=1');
 
   if (path.endsWith('player/data')) {                // the game's persistent save data
-    const pd = form.get('pd');
+    const pd = form.get('pd') ?? q.get('pd');
     if (pd) await savePd(gid, pd);
     return text('result=1');
   }
@@ -131,12 +132,12 @@ async function api(req, u, path) {
 }
 
 async function loadPd(gid) {
-  const cache = await caches.open(CACHE);
+  const cache = await caches.open(SAVES);
   const r = await cache.match(CC + 'pd/' + gid);
   return r ? r.text() : '';
 }
 async function savePd(gid, pd) {
-  const cache = await caches.open(CACHE);
+  const cache = await caches.open(SAVES);
   await cache.put(CC + 'pd/' + gid, new Response(pd, { headers: { 'Content-Type': 'text/plain' } }));
 }
 

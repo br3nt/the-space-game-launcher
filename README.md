@@ -54,6 +54,10 @@ storage/zones/pub/stingers/ccblocks.swf        (optional, the Casual Collective 
 You can also drop the zips on the page when it is served locally; it works the same as on GitHub
 Pages. A static server is required either way: service workers do not run from `file://`.
 
+Files under `storage/` are converted and cached in the browser on first use, so after editing one,
+click "Clear stored files" on the page to pick up the change. Saved progress lives in a separate
+cache and survives that.
+
 ## How it works
 
 1. Loader → `POST widget.casualcollective.com/load` → `zone=pub&w1=<widget url>&w2=<api base>`.

@@ -30,6 +30,12 @@
     'ccblocks.swf': ['zones/pub/stingers/ccblocks.swf'],
   };
 
+  const KNOWN = new Set([...Object.values(GAMES).flatMap(g => [...g.required, ...g.optional]), ...Object.values(LOOSE).flat()]);
+  // Known-good sha256 of the Flashpoint data packs, checked on import.
+  const PACKS = {
+    '80790aab1c8da74fa7d2202fc9a788e23e7480a7c41933ff5140c9f8534dd5ab': 'The Space Game data pack',
+    '937d1e37774f82a1968f122e21d715e78988eac8579902cffb2c185da12b36b2': 'The Space Game: Missions data pack',
+  };
   const $ = s => document.querySelector(s);
   const $$ = s => [...document.querySelectorAll(s)];
 
@@ -40,7 +46,8 @@
     document.body.dataset.tab = name;
   }
   $$('.tab').forEach(t => t.addEventListener('click', () => { showTab(t.dataset.tab); history.replaceState(null, '', '#' + t.dataset.tab); }));
-  showTab(GAMES[location.hash.slice(1)] ? 'play' : (location.hash.slice(1) || 'play'));
+  const hash = location.hash.slice(1);
+  showTab(document.querySelector(`.panel[data-panel="${CSS.escape(hash)}"]`) ? hash : 'play');
 
   // ---- starfield -------------------------------------------------------------------------------
   const cv = $('#stars'), cx = cv.getContext('2d');
@@ -81,6 +88,7 @@
       if (!sessionStorage.getItem('tsg-reloaded')) { sessionStorage.setItem('tsg-reloaded', '1'); location.reload(); return; }
       setStatus('The service worker did not take control of the page. Reload once.', 100, 'error'); return;
     }
+    sessionStorage.removeItem('tsg-reloaded');
     swReady = true;
   }
 
@@ -144,14 +152,16 @@
     }
   }
 
-  async function importFile(file) {
+  async function importFile(file, warnings) {
     const name = file.name.toLowerCase();
     let stored = 0;
     if (name.endsWith('.zip')) {
       const buf = await file.arrayBuffer();
+      const digest = [...new Uint8Array(await crypto.subtle.digest('SHA-256', buf))].map(b => b.toString(16).padStart(2, '0')).join('');
+      if (!PACKS[digest]) warnings.push(`${file.name} is not one of the known Flashpoint data packs (sha256 ${digest.slice(0, 12)}…); imported anyway, at your own risk.`);
       for await (const e of zipEntries(buf)) {
         const m = e.name.match(/^content\/storage\.cloud\.casualcollective\.com\/(.+\.swf)$/i);
-        if (!m) continue;
+        if (!m || !KNOWN.has(m[1])) continue;               // only the paths the launcher knows about
         setStatus(`Importing ${m[1]}`, 60, 'busy');
         await storeSWF(m[1], await e.read()); stored++;
       }
@@ -165,10 +175,11 @@
   }
 
   async function importFiles(files) {
-    let total = 0;
+    let total = 0; const warnings = [];
     try {
-      for (const f of files) total += await importFile(f);
-      setStatus(total ? `Imported ${total} file${total === 1 ? '' : 's'}. Files stay in this browser until you clear them.` : 'Nothing usable in that. Expecting the Flashpoint data pack zips or the SWFs by name.', 100, total ? 'ok' : 'error');
+      for (const f of files) total += await importFile(f, warnings);
+      if (warnings.length) setStatus(warnings.join(' '), 100, 'error');
+      else setStatus(total ? `Imported ${total} file${total === 1 ? '' : 's'}. Files stay in this browser until you clear them.` : 'Nothing usable in that. Expecting the Flashpoint data pack zips or the SWFs by name.', 100, total ? 'ok' : 'error');
     } catch (err) { setStatus(String(err.message || err), 100, 'error'); }
     await refreshFiles();
   }
@@ -178,10 +189,10 @@
   drop.addEventListener('dragleave', () => drop.classList.remove('over'));
   drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); importFiles([...e.dataTransfer.files]); });
   $('#file-input').addEventListener('change', e => importFiles([...e.target.files]));
-  $('#clear').addEventListener('click', async () => { await caches.delete(CACHE); setStatus('Stored files and save data cleared.', 100, ''); refreshFiles(); });
+  $('#clear').addEventListener('click', async () => { await caches.delete(CACHE); setStatus('Stored game files cleared. Saved progress is kept.', 100, ''); refreshFiles(); });
 
   // ---- play ------------------------------------------------------------------------------------
-  let player = null;
+  let player = null, runningTimer = 0;
   async function play(id) {
     const g = GAMES[id];
     setStatus('Starting…', 10, 'busy');
@@ -195,24 +206,30 @@
     player = window.RufflePlayer.newest().createPlayer();
     $('#stage').appendChild(player);
     setStatus('Loading: 0%', 0, 'busy');
-    player.ruffle().load({
-      url: STORAGE + g.loader,
-      allowNetworking: 'all', allowScriptAccess: true, autoplay: 'on', unmuteOverlay: 'hidden', openUrlMode: 'confirm',
-      scale: 'showAll', forceScale: true, forceAlign: true, backgroundColor: '#000000', logLevel: 'warn',
-      urlRewriteRules: [
-        [/^https?:\/\/(widget|sessions|sessions2)\.casualcollective\.com\//, cc + 'widget.casualcollective.com/'],
-        [/^https?:\/\/storage\.cloud\.casualcollective\.com\//, cc + 'storage.cloud.casualcollective.com/'],
-      ],
-    });
+    clearTimeout(runningTimer);
     player.addEventListener('loadedmetadata', () => { setStatus('Loading: 100%', 100, 'ok'); applyVolume(); });
-    setTimeout(() => setStatus(`${g.title} is running.`, 100, 'ok'), 6000);
     player.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    try {
+      await player.ruffle().load({
+        url: STORAGE + g.loader,
+        // The widget talks HTTP only (through the service worker); it needs neither page script access nor browser navigation.
+        allowNetworking: 'internal', allowScriptAccess: false, autoplay: 'on', unmuteOverlay: 'hidden', openUrlMode: 'confirm',
+        scale: 'showAll', forceScale: true, forceAlign: true, backgroundColor: '#000000', logLevel: 'warn',
+        urlRewriteRules: [
+          [/^https?:\/\/(widget|sessions|sessions2)\.casualcollective\.com\//, cc + 'widget.casualcollective.com/'],
+          [/^https?:\/\/storage\.cloud\.casualcollective\.com\//, cc + 'storage.cloud.casualcollective.com/'],
+        ],
+      });
+    } catch (err) {
+      setStatus(`Could not load ${g.loader}: ${err.message || err}`, 100, 'error'); return;
+    }
+    runningTimer = setTimeout(() => setStatus(`${g.title} is running.`, 100, 'ok'), 6000);
   }
   $$('[data-play]').forEach(b => b.addEventListener('click', () => play(b.dataset.play)));
   $('#fullscreen').addEventListener('click', () => $('#stage').requestFullscreen && $('#stage').requestFullscreen());
   // Volume and mute drive Ruffle directly; the widget's own bar (bottom 25px of its stage) is clipped off by CSS.
   let muted = false;
-  function applyVolume() { if (player) player.volume = muted ? 0 : 1; document.body.classList.toggle('muted', muted); $('#mute').title = muted ? 'Unmute' : 'Mute'; }
+  function applyVolume() { if (player) player.volume = muted ? 0 : 1; document.body.classList.toggle('muted', muted); $('#mute').title = muted ? 'Unmute' : 'Mute'; $('#mute').setAttribute('aria-pressed', String(muted)); }
   $('#mute').addEventListener('click', () => { muted = !muted; applyVolume(); });
 
   // ---- go ------------------------------------------------------------------------------------
