@@ -98,6 +98,8 @@ code { color: #ffe08a; }
 }
 .loadbar::before { content: ''; position: absolute; inset: 0; width: var(--pct); background: linear-gradient(#ffe680, #f5c400); transition: width 0.4s; }
 .loadbar span { position: relative; }
+.loadbar a { color: #0a3a6a; }
+.loadbar a:hover { color: #000; }
 .loadbar .ctl { margin-left: auto; display: flex; gap: 4px; }
 .ico { background: none; border: none; padding: 2px 6px; color: #123; cursor: pointer; line-height: 0; }
 .ico:hover { color: #000; background: rgba(255,255,255,0.35); border-radius: 4px; }
@@ -107,9 +109,17 @@ body.muted .ico .cross { display: block; }
 .loadbar[data-kind="error"]::before { background: linear-gradient(#ff9a9a, #e04040); }
 .loadbar[data-kind="ok"]::before { background: linear-gradient(#b8ff9a, #4bd63b); }
 
-.drop { display: flex; gap: 16px; align-items: center; border: 2px dotted var(--red); background: rgba(40,0,0,0.25); transition: all 0.15s; }
+.drop { display: flex; gap: 16px; align-items: center; padding: 16px 20px; margin: 8px 0 12px; border: 2px dotted var(--red); background: rgba(40,0,0,0.25); transition: all 0.15s; }
 .drop.over { border-color: #fff; background: rgba(255,255,255,0.06); }
 .drop .node { width: 46px; height: 46px; flex: none; border-radius: 50%; border: 3px dotted #fff; position: relative; }
+.dropstatus { margin: -4px 0 12px; font-weight: 700; color: var(--ink); }
+.dropstatus[data-kind="ok"] { color: var(--green); }
+.dropstatus[data-kind="error"] { color: var(--red); }
+.dropstatus[data-kind="busy"] { color: var(--yellow); }
+.checks { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+@media (max-width: 720px) { .checks { grid-template-columns: 1fr; } }
+.checks h4 { margin: 0; font: 700 16px/1.4 var(--body); color: #fff; display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.checks h4 .ready { font-size: 0.85em; }
 .drop .node::after { content: ''; position: absolute; inset: 14px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 10px var(--yellow); }
 
 /* files */
@@ -124,6 +134,7 @@ body.muted .ico .cross { display: block; }
 .chain li::before { content: counter(step); position: absolute; left: 12px; top: 10px; width: 28px; height: 28px; border-radius: 50%; border: 2px dotted var(--orange); color: var(--orange); font-weight: 700; text-align: center; line-height: 26px; }
 .chain b { color: #fff; }
 .arrow { color: var(--green); font-weight: 700; font-size: 0.85em; }
+.shot { display: block; max-width: 100%; height: auto; margin: 0 0 16px; border: 1px solid #333; }
 
 /* gallery */
 .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -136,7 +147,7 @@ body.muted .ico .cross { display: block; }
 .credits dt { color: var(--yellow); font-weight: 700; margin-top: 10px; }
 .credits dd { margin: 2px 0 0; }
 
-/* the Casual Collective widget's grey bottom bar */
-.ccbtn { font: 700 14px var(--body); color: #123; text-decoration: none; padding: 4px 12px; background: linear-gradient(#e4f3ff, #a9d6f5); border: 1px solid #7fb6dc; border-radius: 4px; }
-.ccbtn:hover { background: linear-gradient(#f4faff, #c4e4fa); color: #000; }
-.ccbar { display: flex; justify-content: flex-end; gap: 8px; margin: 0 -28px; padding: 8px 12px; background: linear-gradient(#f2f2f2, #d9d9d9); border-top: 1px solid #aaa; }
+/* footer links, styled like the game's dark buttons */
+.ccbtn { font: 700 14px var(--body); color: #ddd; text-decoration: none; padding: 5px 14px; background: linear-gradient(#2a2a2a, #0a0a0a); border: 1px solid #444; }
+.ccbtn:hover { color: var(--yellow); border-color: var(--yellow); background: linear-gradient(#333, #111); }
+.ccbar { display: flex; justify-content: flex-end; gap: 8px; margin: 0 -28px; padding: 12px 20px; background: linear-gradient(#0e0e0e, #000); border-top: 1px solid var(--edge); }

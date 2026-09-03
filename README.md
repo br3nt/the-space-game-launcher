@@ -13,7 +13,7 @@ original loader, wrapper and game run unmodified in [Ruffle](https://ruffle.rs/)
 **Play it: <https://br3nt.github.io/the-space-game-launcher/>**
 
 No game files are in this repo. You fetch them from the archives (links and checksums are on the
-page and below) and drop them on the page. They stay in your browser.
+page and below) and drop them on the page's "Get the files" tab. They stay in your browser.
 
 ## Get the files
 
@@ -60,6 +60,9 @@ cache and survives that.
 
 ## How it works
 
+The SWF on archive.org, Kongregate and elsewhere is a 16 KB loader, not the game. Casual Collective
+never shipped their games as one file. When the loader starts:
+
 1. Loader → `POST widget.casualcollective.com/load` → `zone=pub&w1=<widget url>&w2=<api base>`.
 2. Loader loads `w1&wcc=w2&gid=10&rid=…`.
 3. Widget → `POST <wcc>/pub/session/setup?gid=10` → JSON. `result` must be `1`;
@@ -69,6 +72,12 @@ cache and survives that.
 5. Handshake: the game sets `hss = random(9999999)`; the widget calls
    `game.CCHandshake((hss/11 - int(hss/11)) + hss % 11)`; on success it calls `game.CCSetup()` and
    injects `game.CCAPI`.
+
+The servers answering those calls were switched off in early December 2020, a few weeks before
+Adobe retired Flash (a Desktop Tower Defense player [logged it](https://forum.defold.com/t/rip-desktop-tower-defense-long-live-desktop-tower-defense/66988)
+on 9 December 2020; the Wayback Machine's last working capture of `widget.casualcollective.com/load`
+is from [January 2020](https://web.archive.org/web/20200114090911/http://widget.casualcollective.com/load?r=)).
+Step 1 fails and the loader prints its error. Not Flash: the server.
 
 `sw.js` intercepts `<scope>cc/<host>/<path>` (the page tells Ruffle to rewrite the
 `*.casualcollective.com` hostnames to that) and serves the SWFs from the browser's Cache Storage

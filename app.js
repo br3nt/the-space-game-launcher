@@ -45,7 +45,13 @@
     $$('.panel').forEach(p => { p.hidden = p.dataset.panel !== name; });
     document.body.dataset.tab = name;
   }
-  $$('.tab').forEach(t => t.addEventListener('click', () => { showTab(t.dataset.tab); history.replaceState(null, '', '#' + t.dataset.tab); }));
+  function goTab(name) { showTab(name); history.replaceState(null, '', '#' + name); }
+  $$('.tab').forEach(t => t.addEventListener('click', () => goTab(t.dataset.tab)));
+  // In-text links between tabs ("See Get the files").
+  document.addEventListener('click', e => {
+    const a = e.target.closest('[data-goto]'); if (!a) return;
+    e.preventDefault(); goTab(a.dataset.goto); $('.tabs').scrollIntoView({ block: 'start' });
+  });
   const hash = location.hash.slice(1);
   showTab(document.querySelector(`.panel[data-panel="${CSS.escape(hash)}"]`) ? hash : 'play');
 
@@ -68,12 +74,15 @@
   addEventListener('resize', resize); resize(); requestAnimationFrame(draw);
 
   // ---- status line (styled like the loader's "Loading: 100%" bar) ------------------------------
-  const status = $('#status'), statusText = $('#status-text');
-  function setStatus(msg, pct, kind) {
-    statusText.textContent = msg;
+  const status = $('#status'), statusText = $('#status-text'), dropStatus = $('#drop-status');
+  const FILES_LINK = '<a href="#files" data-goto="files">Get the files</a>';
+  function setStatus(msg, pct, kind, html) {
+    if (html) statusText.innerHTML = msg; else statusText.textContent = msg;
     status.style.setProperty('--pct', (pct ?? 100) + '%');
     status.dataset.kind = kind || '';
   }
+  // Import messages are also shown next to the drop zone, which lives on the "Get the files" tab.
+  function setDropStatus(msg, kind) { dropStatus.textContent = msg; dropStatus.dataset.kind = kind || ''; dropStatus.hidden = !msg; }
 
   // ---- service worker --------------------------------------------------------------------------
   let swReady = false;
@@ -112,8 +121,10 @@
         ul.appendChild(li);
       }
       $(`#play-${id}`).disabled = !ok;
-      $(`#ready-${id}`).textContent = ok ? 'Ready to launch' : 'Files missing';
+      $(`#ready-${id}`).innerHTML = ok ? 'Ready to launch' : 'No files yet. ' + FILES_LINK;
       $(`#ready-${id}`).className = 'ready ' + (ok ? 'ok' : 'no');
+      $(`#check-${id}`).textContent = ok ? 'Ready' : 'Files missing';
+      $(`#check-${id}`).className = 'ready ' + (ok ? 'ok' : 'no');
     }
   }
 
@@ -162,7 +173,7 @@
       for await (const e of zipEntries(buf)) {
         const m = e.name.match(/^content\/storage\.cloud\.casualcollective\.com\/(.+\.swf)$/i);
         if (!m || !KNOWN.has(m[1])) continue;               // only the paths the launcher knows about
-        setStatus(`Importing ${m[1]}`, 60, 'busy');
+        setStatus(`Importing ${m[1]}`, 60, 'busy'); setDropStatus(`Importing ${m[1]}`, 'busy');
         await storeSWF(m[1], await e.read()); stored++;
       }
     } else if (name.endsWith('.swf')) {
@@ -176,12 +187,17 @@
 
   async function importFiles(files) {
     let total = 0; const warnings = [];
+    let msg, kind;
     try {
       for (const f of files) total += await importFile(f, warnings);
-      if (warnings.length) setStatus(warnings.join(' '), 100, 'error');
-      else setStatus(total ? `Imported ${total} file${total === 1 ? '' : 's'}. Files stay in this browser until you clear them.` : 'Nothing usable in that. Expecting the Flashpoint data pack zips or the SWFs by name.', 100, total ? 'ok' : 'error');
-    } catch (err) { setStatus(String(err.message || err), 100, 'error'); }
+      if (warnings.length) { msg = warnings.join(' '); kind = 'error'; }
+      else if (total) { msg = `Imported ${total} file${total === 1 ? '' : 's'}.`; kind = 'ok'; }
+      else { msg = 'Nothing usable in that. Expecting the Flashpoint data pack zips or the SWFs by name.'; kind = 'error'; }
+    } catch (err) { msg = String(err.message || err); kind = 'error'; }
+    setStatus(msg, 100, kind); setDropStatus(msg, kind);
     await refreshFiles();
+    const ready = Object.keys(GAMES).filter(id => !$(`#play-${id}`).disabled);
+    if (kind === 'ok' && ready.length) setDropStatus(msg + ' Ready to play.', 'ok');
   }
 
   const drop = $('#drop');
@@ -189,7 +205,7 @@
   drop.addEventListener('dragleave', () => drop.classList.remove('over'));
   drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); importFiles([...e.dataTransfer.files]); });
   $('#file-input').addEventListener('change', e => importFiles([...e.target.files]));
-  $('#clear').addEventListener('click', async () => { await caches.delete(CACHE); setStatus('Stored game files cleared. Saved progress is kept.', 100, ''); refreshFiles(); });
+  $('#clear').addEventListener('click', async () => { await caches.delete(CACHE); setStatus('Stored game files cleared. Saved progress is kept.', 100, ''); setDropStatus('Stored game files cleared. Saved progress is kept.', ''); refreshFiles(); });
 
   // ---- play ------------------------------------------------------------------------------------
   let player = null, runningTimer = 0;
@@ -239,7 +255,8 @@
     await refreshFiles();
     if (swReady) {
       const ready = Object.keys(GAMES).filter(id => !$(`#play-${id}`).disabled);
-      setStatus(ready.length ? 'Ready. Pick a game.' : 'No game files yet. See "Get the files".', 100, ready.length ? 'ok' : 'error');
+      if (ready.length) setStatus('Ready. Pick a game.', 100, 'ok');
+      else setStatus('No game files yet. This page has none; ' + FILES_LINK + ' tells you where.', 100, 'error', true);
       const want = location.hash.slice(1);
       if (GAMES[want] && ready.includes(want)) play(want);
     }

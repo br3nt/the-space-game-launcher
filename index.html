@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%23ffc400' stroke-width='3' stroke-dasharray='4 4'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23ffc400'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="style.css?v=5">
 <script src="https://unpkg.com/@ruffle-rs/ruffle@0.5.0"></script>
 </head>
 <body data-tab="play">
@@ -35,13 +35,11 @@
       <div class="card game">
         <h2>The Space Game</h2>
         <p>The original. Training, missions, mining modes, survival modes and the bonus modes. Version 1.07, 25th Feb 2009.</p>
-        <ul id="files-thespacegame" class="files"></ul>
         <div class="row"><span id="ready-thespacegame" class="ready no">Checking…</span><button id="play-thespacegame" class="btn go" data-play="thespacegame" disabled>Launch</button></div>
       </div>
       <div class="card game">
         <h2>The Space Game<span class="orange">: Missions</span></h2>
         <p>The 2009 follow-up. An eight-mission campaign with Easy 1x, Normal 1.5x, Hard 2x and Crazy 3x multipliers, the EMP, the Super Miner and warp jumps.</p>
-        <ul id="files-tsgmissions" class="files"></ul>
         <div class="row"><span id="ready-tsgmissions" class="ready no">Checking…</span><button id="play-tsgmissions" class="btn go" data-play="tsgmissions" disabled>Launch</button></div>
       </div>
     </div>
@@ -54,15 +52,6 @@
           <button id="mute" class="ico" title="Mute" aria-label="Sound" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 9v6h4l5 4V5L7 9H3z" fill="currentColor"/><path class="waves" d="M15 8.5a4 4 0 0 1 0 7M17.5 6a7.5 7.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="cross" d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
           <button id="fullscreen" class="ico" title="Full screen" aria-label="Full screen"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </span>
-      </div>
-    </div>
-
-    <div class="card drop" id="drop">
-      <div class="node"></div>
-      <div>
-        <strong>Drop the game files here</strong> (the two Flashpoint data pack zips, or the SWFs by name), or
-        <label class="link">choose files<input id="file-input" type="file" multiple accept=".zip,.swf" hidden></label>.
-        They are stored in this browser only and never uploaded anywhere. <button id="clear" class="link">Clear stored files</button>
       </div>
     </div>
   </section>
@@ -85,8 +74,33 @@
     </div>
 
     <div class="card">
-      <h3>2. Drop them on the Play tab</h3>
-      <p>The page unzips them in your browser, converts each SWF to the uncompressed form the wrapper needs, and keeps them in this browser's storage. Nothing is uploaded. Both games share the same wrapper, so the two zips overlap; that is fine.</p>
+      <h3>2. Drop them here</h3>
+      <div class="drop" id="drop">
+        <div class="node"></div>
+        <div>
+          <strong>Drop the two zips here</strong> (or the SWFs by name), or
+          <label class="link">choose files<input id="file-input" type="file" multiple accept=".zip,.swf" hidden></label>.
+          They are stored in this browser only and never uploaded anywhere.
+        </div>
+      </div>
+      <p id="drop-status" class="dropstatus" hidden></p>
+      <p>The page unzips them in your browser, converts each SWF to the uncompressed form the wrapper needs, and keeps them in this browser's storage. Both games share the same wrapper, so the two zips overlap; that is fine.</p>
+      <div class="checks">
+        <div>
+          <h4>The Space Game <span id="check-thespacegame" class="ready no">Checking…</span></h4>
+          <ul id="files-thespacegame" class="files"></ul>
+        </div>
+        <div>
+          <h4>The Space Game: Missions <span id="check-tsgmissions" class="ready no">Checking…</span></h4>
+          <ul id="files-tsgmissions" class="files"></ul>
+        </div>
+      </div>
+      <p class="dim">The files stay in this browser until you <button id="clear" class="link">clear them</button>. Saved progress is kept separately and survives that.</p>
+    </div>
+
+    <div class="card">
+      <h3>3. Play</h3>
+      <p>Head back to <a href="#play" data-goto="play">Play</a> and hit Launch. The games save their progress the way they did in 2009, into your browser instead of Casual Collective's database.</p>
     </div>
 
     <div class="card">
@@ -102,7 +116,9 @@ open http://localhost:8000</pre>
   <!-- ===== HOW ===== -->
   <section class="panel" data-panel="how" style="--c:#ff6a00" hidden>
     <h2>Mine your way into the dead server</h2>
-    <p class="lead">The SWF you can download from archive.org or Kongregate is 16 KB. It is a loader, not the game. Everything it needs came from Casual Collective's servers, and the whole chain has to be answered for the game to start.</p>
+    <p class="lead">If you have tried to play The Space Game from <a href="https://archive.org/details/thespacegame">archive.org</a>, from Kongregate, or from a saved SWF in Ruffle, you will have seen this:</p>
+    <img class="shot" src="assets/unable-to-load.png" alt="The loader's yellow bar: Unable to load game. Please notify www.casualcollective.com." width="778" height="70">
+    <p>Those sites are not running the game. They are running a 16 KB <b>loader</b>. Even the SWF you can download is this loader, not the game. Casual Collective never shipped their games as one file: the loader fetched a wrapper, the wrapper fetched a config, the config named the real game, and all of it came from Casual Collective's own servers. When the loader starts, this is what happens:</p>
 
     <ol class="chain">
       <li><b>Loader</b> <span class="arrow">POST</span> <code>widget.casualcollective.com/load</code><br>Gets back <code>w1</code>, the URL of the "widget" wrapper SWF, and <code>w2</code>, the API base.</li>
@@ -111,11 +127,13 @@ open http://localhost:8000</pre>
       <li><b>Handshake.</b> The game sets <code>hss = random(9999999)</code>. The widget calls <code>game.CCHandshake((hss/11 - int(hss/11)) + hss % 11)</code>. Only on success does it call <code>game.CCSetup()</code> and hand over the score/save API. Without it the game sits on a white screen forever.</li>
     </ol>
 
+    <p>The servers answering those calls were switched off in early December 2020, a few weeks before Adobe retired Flash. A Desktop Tower Defense player <a href="https://forum.defold.com/t/rip-desktop-tower-defense-long-live-desktop-tower-defense/66988">logged the plug being pulled</a> on the Defold forum; the Wayback Machine's last working capture of <a href="https://web.archive.org/web/20200114090911/http://widget.casualcollective.com/load?r="><code>widget.casualcollective.com/load</code></a> is from January 2020, and by January 2021 the hostname redirected to KIXEYE, the company Casual Collective became. Step 1 fails, and the loader prints the message above.</p>
+    <p>That is why the game no longer works. Not Flash: the server.</p>
+
     <div class="card">
       <h3>What this page does</h3>
       <p>A <a href="https://github.com/br3nt/the-space-game-launcher/blob/main/sw.js">service worker</a> intercepts every request to the Casual Collective hostnames and answers them itself: the loader's one-line config, the setup JSON (with player class 2, a member, so the members-only content is on), <code>result=1</code> for the score and level pings, and the save data round trip. The SWFs come from your browser's storage. The loader, wrapper and games run byte for byte as they shipped in 2009, in <a href="https://ruffle.rs/">Ruffle</a>.</p>
-      <p>Two things cost an evening: the wrapper's preloader only proceeds when Ruffle reports every byte loaded, which needs the child SWFs stored uncompressed, and a background browser tab throttles Ruffle to a crawl, which looks like a hang.</p>
-      <p>The full story is in the <a href="https://br3nt.github.io/">blog post</a>.</p>
+      <p>It was a bit of a journey getting the games to run. The wrapper's preloader only proceeds when Ruffle reports every byte loaded, which needs the child SWFs stored uncompressed, and a background browser tab throttles Ruffle to a crawl, which looks like a hang. The full story is in the <a href="https://br3nt.github.io/">blog post</a>.</p>
     </div>
   </section>
 
@@ -127,6 +145,9 @@ open http://localhost:8000</pre>
       <figure><img src="assets/tsg-missions.jpg" alt="The Space Game Missions tab: a curved route of asteroid fields from blue friendly space into red enemy space" loading="lazy"><figcaption>Mine your way into enemy space</figcaption></figure>
       <figure><img src="assets/tsg-level-select.jpg" alt="Mission 1 briefing over a green nebula: mine half of the minerals in the asteroid field" loading="lazy"><figcaption>Mission 1: My first asteroid field</figcaption></figure>
       <figure><img src="assets/tsg-ingame-b.jpg" alt="In play: the base at the centre of a green nebula with asteroids, the build bar along the bottom" loading="lazy"><figcaption>500 minerals, 4 energy, everything to do</figcaption></figure>
+      <figure><img src="assets/tsg-ingame-build.jpg" alt="Seventeen seconds into Mission 1: three miners on asteroids, a solar array and a node linked to the base by blue power lines" loading="lazy"><figcaption>Miners first. Three on asteroids, a solar array, a node</figcaption></figure>
+      <figure><img src="assets/tsg-fight.jpg" alt="Mission 1 under attack: red fighters strafing the miners around the base while the repair station and turrets hold, 44% mined" loading="lazy"><figcaption>The first wave arrives. Build the lasers before this</figcaption></figure>
+      <figure><img src="assets/tsg-defeated.jpg" alt="The Defeated screen: 26% of the field mined, 568 minerals, graphs of energy reserves and minerals per minute" loading="lazy"><figcaption>Defeated. Fast forward with no turrets is not a strategy</figcaption></figure>
       <figure><img src="assets/tsgm-menu.jpg" alt="The Space Game: Missions main menu with the Join us on the Casual Collective banner" loading="lazy"><figcaption>Missions, complete with the 2009 membership banner</figcaption></figure>
       <figure><img src="assets/tsgm-map.jpg" alt="The Missions star map: dashed routes between mission nodes over purple nebulae, with Easy, Normal, Hard and Crazy completion counters" loading="lazy"><figcaption>The Missions star map</figcaption></figure>
     </div>
@@ -153,6 +174,6 @@ open http://localhost:8000</pre>
   </footer>
 </main>
 
-<script src="app.js?v=4"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
