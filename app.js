@@ -39,6 +39,7 @@
   };
   const $ = s => document.querySelector(s);
   const $$ = s => [...document.querySelectorAll(s)];
+  const drop = $('#drop');
 
   // ---- tabs ------------------------------------------------------------------------------------
   function showTab(name) {
@@ -109,6 +110,7 @@
     try { const r = await fetch(SCOPE + 'storage/' + path, { method: 'HEAD', cache: 'no-store' }); return r.ok; } catch { return false; }
   }
   async function refreshFiles() {
+    let allReady = true;
     for (const [id, g] of Object.entries(GAMES)) {
       const rows = [...g.required.map(p => [p, true]), ...g.optional.map(p => [p, false])];
       const ul = $(`#files-${id}`); ul.innerHTML = '';
@@ -121,12 +123,17 @@
         li.innerHTML = `<span class="mark"></span><code>${p}</code>${req ? '' : ' <em>optional</em>'}`;
         ul.appendChild(li);
       }
+      if (!ok) allReady = false;
       $(`#play-${id}`).disabled = !ok;
       $(`#ready-${id}`).innerHTML = ok ? 'Ready to launch' : 'No files yet. ' + FILES_LINK;
       $(`#ready-${id}`).className = 'ready ' + (ok ? 'ok' : 'no');
       $(`#check-${id}`).textContent = ok ? 'Ready' : 'Files missing';
       $(`#check-${id}`).className = 'ready ' + (ok ? 'ok' : 'no');
     }
+    // Once every file is in, the drop zone has done its job. It comes back if the files are cleared.
+    drop.hidden = allReady;
+    $('#drop-blurb').hidden = allReady;
+    $('#drop-done').hidden = !allReady;
   }
 
   // Saved progress, per game: what sw.js stored from the game's player/data posts.
@@ -222,7 +229,6 @@
     if (kind === 'ok' && ready.length) setDropStatus(msg + ' Ready to play.', 'ok');
   }
 
-  const drop = $('#drop');
   drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
   drop.addEventListener('dragleave', () => drop.classList.remove('over'));
   drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); importFiles([...e.dataTransfer.files]); });

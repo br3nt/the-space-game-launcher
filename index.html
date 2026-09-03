@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%23ffc400' stroke-width='3' stroke-dasharray='4 4'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23ffc400'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=8">
+<link rel="stylesheet" href="style.css?v=9">
 <script src="https://unpkg.com/@ruffle-rs/ruffle@0.5.0"></script>
 </head>
 <body data-tab="play">
@@ -84,7 +84,8 @@
         </div>
       </div>
       <p id="drop-status" class="dropstatus" hidden></p>
-      <p>The page unzips them in your browser, converts each SWF to the uncompressed form the wrapper needs, and keeps them in this browser's storage. Both games share the same wrapper, so the two zips overlap; that is fine.</p>
+      <p id="drop-blurb">The page unzips them in your browser, converts each SWF to the uncompressed form the wrapper needs, and keeps them in this browser's storage. Both games share the same wrapper, so the two zips overlap; that is fine.</p>
+      <p id="drop-done" hidden>Every file is in. Both games are ready to launch.</p>
       <div class="checks">
         <div>
           <h4>The Space Game <span id="check-thespacegame" class="ready no">Checking…</span></h4>
@@ -180,6 +181,6 @@ open http://localhost:8000</pre>
   </footer>
 </main>
 
-<script src="app.js?v=8"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>

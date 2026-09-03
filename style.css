@@ -6,6 +6,7 @@
   --body: 'Trebuchet MS', 'Lucida Grande', Verdana, sans-serif;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; background: #000; color: var(--ink); font: 17px/1.5 var(--body); }
 a { color: var(--blue); }
 a:hover { color: #fff; }
