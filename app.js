@@ -49,7 +49,7 @@
   $$('.tab').forEach(t => t.addEventListener('click', () => goTab(t.dataset.tab)));
   // In-text links between tabs ("See Get the files").
   document.addEventListener('click', e => {
-    const a = e.target.closest('[data-goto]'); if (!a) return;
+    const a = e.target.closest('[data-goto]'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
     e.preventDefault(); goTab(a.dataset.goto); $('.tabs').scrollIntoView({ block: 'start' });
   });
   const hash = location.hash.slice(1);
@@ -205,6 +205,9 @@
   drop.addEventListener('dragleave', () => drop.classList.remove('over'));
   drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); importFiles([...e.dataTransfer.files]); });
   $('#file-input').addEventListener('change', e => importFiles([...e.target.files]));
+  // A zip dropped anywhere else (the Play tab, say) must not navigate the page away; route it to the importer.
+  addEventListener('dragover', e => e.preventDefault());
+  addEventListener('drop', e => { e.preventDefault(); if (drop.contains(e.target)) return; goTab('files'); importFiles([...e.dataTransfer.files]); });
   $('#clear').addEventListener('click', async () => { await caches.delete(CACHE); setStatus('Stored game files cleared. Saved progress is kept.', 100, ''); setDropStatus('Stored game files cleared. Saved progress is kept.', ''); refreshFiles(); });
 
   // ---- play ------------------------------------------------------------------------------------
@@ -256,7 +259,7 @@
     if (swReady) {
       const ready = Object.keys(GAMES).filter(id => !$(`#play-${id}`).disabled);
       if (ready.length) setStatus('Ready. Pick a game.', 100, 'ok');
-      else setStatus('No game files yet. This page has none; ' + FILES_LINK + ' tells you where.', 100, 'error', true);
+      else setStatus('No game files yet. ' + FILES_LINK + '.', 100, 'error', true);
       const want = location.hash.slice(1);
       if (GAMES[want] && ready.includes(want)) play(want);
     }

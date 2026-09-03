@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%23ffc400' stroke-width='3' stroke-dasharray='4 4'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23ffc400'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 <script src="https://unpkg.com/@ruffle-rs/ruffle@0.5.0"></script>
 </head>
 <body data-tab="play">
@@ -118,7 +118,7 @@ open http://localhost:8000</pre>
     <h2>Mine your way into the dead server</h2>
     <p class="lead">If you have tried to play The Space Game from <a href="https://archive.org/details/thespacegame">archive.org</a>, from Kongregate, or from a saved SWF in Ruffle, you will have seen this:</p>
     <img class="shot" src="assets/unable-to-load.png" alt="The loader's yellow bar: Unable to load game. Please notify www.casualcollective.com." width="778" height="70">
-    <p>Those sites are not running the game. They are running a 16 KB <b>loader</b>. Even the SWF you can download is this loader, not the game. Casual Collective never shipped their games as one file: the loader fetched a wrapper, the wrapper fetched a config, the config named the real game, and all of it came from Casual Collective's own servers. When the loader starts, this is what happens:</p>
+    <p>Those sites are not running the game. They are running a 16 KB <b>loader</b>. Even the SWF you can download is this loader, not the game. Casual Collective never shipped their games as one file: the loader asked a server where the wrapper was, the wrapper asked for a config, the config named the real game, and all of it came from Casual Collective's own servers. When the loader starts, this is what happens:</p>
 
     <ol class="chain">
       <li><b>Loader</b> <span class="arrow">POST</span> <code>widget.casualcollective.com/load</code><br>Gets back <code>w1</code>, the URL of the "widget" wrapper SWF, and <code>w2</code>, the API base.</li>
@@ -132,7 +132,7 @@ open http://localhost:8000</pre>
 
     <div class="card">
       <h3>What this page does</h3>
-      <p>A <a href="https://github.com/br3nt/the-space-game-launcher/blob/main/sw.js">service worker</a> intercepts every request to the Casual Collective hostnames and answers them itself: the loader's one-line config, the setup JSON (with player class 2, a member, so the members-only content is on), <code>result=1</code> for the score and level pings, and the save data round trip. The SWFs come from your browser's storage. The loader, wrapper and games run byte for byte as they shipped in 2009, in <a href="https://ruffle.rs/">Ruffle</a>.</p>
+      <p>A <a href="https://github.com/br3nt/the-space-game-launcher/blob/main/sw.js">service worker</a> intercepts the requests to the two Casual Collective hostnames the game talks to and answers them itself: the loader's one-line config, the setup JSON (with player class 2, a member, so the members-only content is on), <code>result=1</code> for the score and level pings, and the save data round trip. The SWFs come from your browser's storage. The loader, wrapper and games run unmodified, as they shipped in 2009 (only stored uncompressed, see below), in <a href="https://ruffle.rs/">Ruffle</a>.</p>
       <p>It was a bit of a journey getting the games to run. The wrapper's preloader only proceeds when Ruffle reports every byte loaded, which needs the child SWFs stored uncompressed, and a background browser tab throttles Ruffle to a crawl, which looks like a hang. The full story is in the <a href="https://br3nt.github.io/">blog post</a>.</p>
     </div>
   </section>
@@ -175,6 +175,6 @@ open http://localhost:8000</pre>
   </footer>
 </main>
 
-<script src="app.js?v=5"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>
