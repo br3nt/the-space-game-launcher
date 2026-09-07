@@ -251,6 +251,7 @@
     if (!window.RufflePlayer || !window.RufflePlayer.newest()) { setStatus('Ruffle did not load. Are you online? (Ruffle is fetched from a CDN.)', 100, 'error'); return; }
     const cc = SCOPE + 'cc/';
     player = window.RufflePlayer.newest().createPlayer();
+    const mine = player;
     $('#stage').appendChild(player);
     setStatus('Loading: 0%', 0, 'busy');
     clearTimeout(runningTimer);
@@ -263,6 +264,9 @@
         // Links the games open (the banners, "More games") are rewritten below to places that still exist, so they open without a prompt.
         allowNetworking: 'all', allowScriptAccess: false, autoplay: 'on', unmuteOverlay: 'hidden', openUrlMode: 'allow',
         scale: 'showAll', forceScale: true, forceAlign: true, backgroundColor: '#000000', logLevel: 'warn',
+        // Like Steam, pause the game while its tab is in the background and resume it when the tab is back. Ruffle's
+        // default keeps ticking on a throttled clock instead, which is the crawl that looks like a hang.
+        backgroundExecutionMode: 'none',
         urlRewriteRules: [
           [/^https?:\/\/(widget|sessions|sessions2)\.casualcollective\.com\//, cc + 'widget.casualcollective.com/'],
           [/^https?:\/\/storage\.cloud\.casualcollective\.com\//, cc + 'storage.cloud.casualcollective.com/'],
@@ -273,9 +277,10 @@
         ],
       });
     } catch (err) {
-      setStatus(`Could not load ${g.loader}: ${err.message || err}`, 100, 'error'); return;
+      if (player === mine) setStatus(`Could not load ${g.loader}: ${err.message || err}`, 100, 'error');
+      return;
     }
-    runningTimer = setTimeout(() => setStatus(`${g.title} is running.`, 100, 'ok'), 6000);
+    if (player === mine) syncStatus(6000); // a second Launch may have replaced this player meanwhile
   }
   $$('[data-play]').forEach(b => b.addEventListener('click', () => play(b.dataset.play)));
   $$('.tab').forEach(t => t.addEventListener('click', () => { if (t.dataset.tab === 'files') refreshSaves(); }));
@@ -284,6 +289,15 @@
   let muted = false;
   function applyVolume() { if (player) player.volume = muted ? 0 : 1; document.body.classList.toggle('muted', muted); $('#mute').title = muted ? 'Unmute' : 'Mute'; $('#mute').setAttribute('aria-pressed', String(muted)); }
   $('#mute').addEventListener('click', () => { muted = !muted; applyVolume(); });
+  // Ruffle does the pausing (backgroundExecutionMode above). This keeps the status bar truthful about it.
+  function syncStatus(delay) {
+    clearTimeout(runningTimer);
+    runningTimer = setTimeout(() => {
+      const title = GAMES[document.body.dataset.game].title;
+      setStatus(document.hidden ? `${title} is paused while this tab is in the background.` : `${title} is running.`, 100, 'ok');
+    }, delay);
+  }
+  document.addEventListener('visibilitychange', () => { if (player) syncStatus(800); });
 
   // ---- go ------------------------------------------------------------------------------------
   setStatus('Checking files…', 30, 'busy');

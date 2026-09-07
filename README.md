@@ -86,6 +86,9 @@ or from `./storage/`, converting compressed SWFs to uncompressed on the way: the
 waits for `getBytesLoaded() == getBytesTotal()`, which Ruffle only satisfies for an uncompressed
 child SWF.
 
+Browsers throttle background tabs, which slows Ruffle to a crawl. Like Steam, the page pauses the game
+while its tab is hidden and resumes it when the tab is back.
+
 The same widget served every Casual Collective game (Desktop TD Pro, Buggle Stars, Desktop Armada,
 Flash Element TD 2, …). `sw.js` carries their ids and versions from Flashpoint's reconstructed
 `setup.php`, untested. Given their files, they should launch the same way.

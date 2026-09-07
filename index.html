@@ -140,7 +140,7 @@ open http://localhost:8000</pre>
     <div class="card">
       <h3>What this page does</h3>
       <p>This page launches the game by answering the requests described above itself. A <a href="https://github.com/br3nt/the-space-game-launcher/blob/main/sw.js">service worker</a> intercepts the requests to the two Casual Collective hostnames the game talks to and answers them itself: the loader's one-line config, the setup JSON (with player class 2, a member, so the members-only content is on), <code>result=1</code> for the score and level pings, and the save data round trip. The SWFs come from your browser's storage. The loader, wrapper and games run unmodified, as they shipped in 2009 (only stored uncompressed, see below), in <a href="https://ruffle.rs/">Ruffle</a>.</p>
-      <p>It was a bit of a journey getting the games to run. The wrapper's preloader only proceeds when Ruffle reports every byte loaded, which needs the child SWFs stored uncompressed, and a background browser tab throttles Ruffle to a crawl, which looks like a hang. The full story is in the <a href="https://br3nt.github.io/">blog post</a>.</p>
+      <p>It was a bit of a journey getting the games to run. The wrapper's preloader only proceeds when Ruffle reports every byte loaded, which needs the child SWFs stored uncompressed, and a background browser tab throttles Ruffle to a crawl, which looks like a hang. That is why the launcher pauses the game while its tab is in the background and resumes it when you come back, the way Steam does. The full story is in the <a href="https://br3nt.github.io/">blog post</a>.</p>
     </div>
   </section>
 
@@ -181,6 +181,6 @@ open http://localhost:8000</pre>
   </footer>
 </main>
 
-<script src="app.js?v=9"></script>
+<script src="app.js?v=10"></script>
 </body>
 </html>
