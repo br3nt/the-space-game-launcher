@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /cc/
+
+Sitemap: https://br3nt.github.io/the-space-game-launcher/sitemap.xml
