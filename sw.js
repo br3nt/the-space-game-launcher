@@ -35,12 +35,19 @@ self.addEventListener('fetch', e => {
   e.respondWith(handle(e.request).catch(err => text('result=0&reason=' + encodeURIComponent(String(err)), 500)));
 });
 
+// The Space Game's own stage is 700x700: a 200px panel under the play area holds the live graphs and the
+// Sandbox wave designer. Its loader and widget say 700x525, and in 2009 the page embedded them taller, so
+// Flash showed the whole game. Ruffle sizes the stage from the root SWF's header, so the loader goes out
+// with its height corrected. The widget pins its bar to Stage.height, so it moves down with it.
+const STAGE_HEIGHT = { 'games/thespacegame.swf': 700 };
+
 async function handle(req) {
   const u = new URL(req.url);
   const bare = u.origin + u.pathname;                  // cache keys never carry a query string
   if (bare.startsWith(STORAGE)) {
     const path = bare.slice(STORAGE.length);
     const res = await resolveFile(path);
+    if (res && STAGE_HEIGHT[path]) return swfResponse(setStageHeight(new Uint8Array(await res.arrayBuffer()), STAGE_HEIGHT[path]));
     return res || text('not found: ' + path, 404);
   }
   if (bare.startsWith(API)) return api(req, u, bare.slice(API.length).replace(/\/+/g, '/'));
@@ -77,6 +84,23 @@ async function toFWS(bytes) {
   new DataView(out.buffer).setUint32(4, out.length, true);
   out.set(body, 8);
   return out;
+}
+
+// Rewrite Ymax in the header RECT of an uncompressed SWF. The RECT is 5 bits of field width, then four
+// signed fields; a 700px stage needs 15 bits, and every SWF here already uses 15, so the bytes stay put.
+function setStageHeight(bytes, px) {
+  if (bytes[0] !== 0x46) return bytes;                                              // only FWS
+  const nbits = bytes[8] >> 3, v = px * 20, start = 5 + 3 * nbits;                 // Ymax is the 4th field
+  if (v >= 1 << (nbits - 1)) return bytes;                                          // would need a wider RECT
+  for (let i = 0; i < nbits; i++) {
+    const bit = start + i, byte = 8 + (bit >> 3), mask = 0x80 >> (bit & 7);
+    if ((v >> (nbits - 1 - i)) & 1) bytes[byte] |= mask; else bytes[byte] &= ~mask;
+  }
+  return bytes;
+}
+
+function swfResponse(swf) {
+  return new Response(swf, { headers: { 'Content-Type': 'application/x-shockwave-flash', 'Content-Length': String(swf.byteLength) } });
 }
 
 async function exists(path) {

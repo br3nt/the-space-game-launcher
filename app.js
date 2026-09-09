@@ -9,12 +9,12 @@
   // Flashpoint's data packs (content/storage.cloud.casualcollective.com/...).
   const GAMES = {
     thespacegame: {
-      title: 'The Space Game', gid: 10, loader: 'games/thespacegame.swf',
+      title: 'The Space Game', gid: 10, loader: 'games/thespacegame.swf', stage: 700,   // 700x700, see sw.js
       required: ['games/thespacegame.swf', 'zones/pub/10/widget.swf', 'zones/pub/10/thespacegame.v83.swf'],
       optional: ['zones/pub/10/thespacegamebg.swf', 'zones/pub/stingers/ccblocks.swf'],
     },
     tsgmissions: {
-      title: 'The Space Game: Missions', gid: 16, loader: 'games/tsgmissions.swf',
+      title: 'The Space Game: Missions', gid: 16, loader: 'games/tsgmissions.swf', stage: 525,
       required: ['games/tsgmissions.swf', 'zones/pub/16/widget.swf', 'zones/pub/16/tsgmissions.v16.swf'],
       optional: ['zones/pub/stingers/ccblocks.swf'],
     },
@@ -252,6 +252,7 @@
     const cc = SCOPE + 'cc/';
     player = window.RufflePlayer.newest().createPlayer();
     const mine = player;
+    $('#stage').style.setProperty('--stage-h', g.stage);   // the widget's bar takes the bottom 25px; CSS clips it
     $('#stage').appendChild(player);
     setStatus('Loading: 0%', 0, 'busy');
     clearTimeout(runningTimer);
