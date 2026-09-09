@@ -90,13 +90,13 @@ code { color: #ffe08a; }
 .link:hover { color: #fff; }
 
 .stagebox { margin: 18px 0 14px; border: 1px solid #444; background: #000; }
-/* The stage is 700 wide by --stage-h tall (525 for Missions, 725 for The Space Game) with the widget's own
-   grey bar in the bottom 25px. Show everything above the bar; the page's bar below the stage stands in for it. */
-.stage { --stage-h: 525; width: 100%; aspect-ratio: 700 / calc(var(--stage-h) - 25); background: #000; overflow: hidden; position: relative; }
-.stage ruffle-player { width: 100%; height: calc(100% * var(--stage-h) / (var(--stage-h) - 25)); display: block; }
+/* The stage is 700 wide by --stage-h rows tall (525 for Missions, 725 for The Space Game, ending in the widget's
+   own grey bar) and shows the top --stage-vis rows: 500 normally, 700 for Sandbox Mode (set from app.js). */
+.stage { --stage-h: 525; --stage-vis: 500; width: 100%; aspect-ratio: 700 / var(--stage-vis); background: #000; overflow: hidden; position: relative; }
+.stage ruffle-player { width: 100%; height: calc(100% * var(--stage-h) / var(--stage-vis)); display: block; }
 .stage:empty { background: radial-gradient(ellipse at 50% 40%, #0d1a0d 0%, #000 70%); }
 .stage:fullscreen { aspect-ratio: auto; }
-.stage:fullscreen ruffle-player { height: calc(100vh * var(--stage-h) / (var(--stage-h) - 25)); }
+.stage:fullscreen ruffle-player { height: calc(100vh * var(--stage-h) / var(--stage-vis)); }
 /* the loader's yellow progress bar */
 .loadbar {
   --pct: 100%; position: relative; height: 34px; display: flex; align-items: center; gap: 8px; background: linear-gradient(#e6e6e6, #cfcfcf); border-top: 1px solid #333; overflow: hidden;

@@ -253,6 +253,7 @@
     player = window.RufflePlayer.newest().createPlayer();
     const mine = player;
     $('#stage').style.setProperty('--stage-h', g.stage);   // the widget's bar takes the bottom 25px; CSS clips it
+    showRows(500);
     $('#stage').appendChild(player);
     setStatus('Loading: 0%', 0, 'busy');
     clearTimeout(runningTimer);
@@ -299,6 +300,26 @@
   let muted = false;
   function applyVolume() { if (player) player.volume = muted ? 0 : 1; document.body.classList.toggle('muted', muted); $('#mute').title = muted ? 'Unmute' : 'Mute'; $('#mute').setAttribute('aria-pressed', String(muted)); }
   $('#mute').addEventListener('click', () => { muted = !muted; applyVolume(); });
+  // The Space Game's stage is 700 rows tall, but only Sandbox Mode (level 13) uses the bottom 200, for its wave
+  // designer. Everywhere else that strip is an empty panel, so the stage shows 500 rows and grows for Sandbox.
+  // The worker relays the widget's level calls; the score or level-update post means the level is over.
+  const SANDBOX = { 10: 13 };
+  function showRows(rows) { $('#stage').style.setProperty('--stage-vis', rows); }
+  navigator.serviceWorker && navigator.serviceWorker.addEventListener('message', e => {
+    const m = e.data || {};
+    if (m.type === 'levelStart') showRows(SANDBOX[m.gid] === m.lnum ? 700 : 500);
+    else if (m.type === 'levelEnd') showRows(500);
+  });
+  // Quitting a level posts nothing, so watch for the game's own Quit button (top right of the play bar) followed
+  // by its YES confirmation, in stage coordinates. Two clicks in the right places within a few seconds.
+  let quitAsked = 0;
+  $('#stage').addEventListener('pointerdown', e => {
+    const st = $('#stage'); if (st.style.getPropertyValue('--stage-vis') !== '700') return;
+    const r = st.getBoundingClientRect(), k = 700 / r.width;
+    const x = (e.clientX - r.left) * k, y = (e.clientY - r.top) * k;
+    if (x >= 555 && x <= 610 && y <= 26) quitAsked = Date.now();
+    else if (x >= 538 && x <= 588 && y >= 26 && y <= 52 && Date.now() - quitAsked < 8000) { quitAsked = 0; showRows(500); }
+  }, true);
   // Ruffle does the pausing (backgroundExecutionMode above). This keeps the status bar truthful about it.
   function syncStatus(delay) {
     clearTimeout(runningTimer);

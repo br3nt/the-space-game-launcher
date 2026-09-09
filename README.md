@@ -89,8 +89,9 @@ child SWF.
 The Space Game's own stage is 700x700. The 200px strip under the play area holds the live graphs and the
 Sandbox wave designer. Its loader and widget say 700x525, and in 2009 the page embedded them taller, so
 Flash showed the lot with the widget's bar under it. Ruffle sizes the stage from the root SWF's header, so
-`sw.js` serves that loader with its height corrected to 725 and the page sizes the stage per game. Missions
-is 700x500 and needs nothing.
+`sw.js` serves that loader with its height corrected to 725. The page shows 500 rows, and grows to 700 for
+Sandbox Mode, the one screen that needs the strip: the worker relays the widget's level-start and score
+calls so the page knows. Missions is 700x500 and needs nothing.
 
 Browsers throttle background tabs, which slows Ruffle to a crawl. Like Steam, the page pauses the game
 while its tab is hidden and resumes it when the tab is back.

@@ -141,6 +141,10 @@ async function api(req, u, path) {
 
   if (path.endsWith('session/start')) return text('sid=1&result=1');
 
+  // The page wants to know which level is running (Sandbox Mode uses the game's bottom panel).
+  if (path.endsWith('session/levelStart')) tell({ type: 'levelStart', gid, lnum: Number(form.get('lnum')) });
+  if (path.endsWith('session/score') || path.endsWith('session/levelUpdate')) tell({ type: 'levelEnd', gid });
+
   if (path.endsWith('player/data')) {                // the game's persistent save data
     // URLSearchParams decoded the POST layer; the game escape()s the k=v,k=v string itself before
     // handing it to the widget, so decode once more and store it plain. Stored escaped, the game
@@ -167,6 +171,10 @@ async function loadPd(gid) {
 async function savePd(gid, pd) {
   const cache = await caches.open(SAVES);
   await cache.put(CC + 'pd/' + gid, new Response(pd, { headers: { 'Content-Type': 'text/plain' } }));
+}
+
+async function tell(msg) {
+  for (const c of await self.clients.matchAll({ includeUncontrolled: true })) c.postMessage(msg);
 }
 
 function text(body, status = 200) {
