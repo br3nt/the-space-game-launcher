@@ -115,8 +115,10 @@
       <p>Clone <a href="https://github.com/br3nt/the-space-game-launcher">the repo</a>, unzip the packs, and put the SWFs under <code>storage/</code> keeping their paths, so you end up with <code>storage/games/thespacegame.swf</code>, <code>storage/zones/pub/10/widget.swf</code> and so on. Then serve the folder with any static server and open it. Service workers don't run from <code>file://</code>, so a double-click on <code>index.html</code> won't do.</p>
 <pre>git clone https://github.com/br3nt/the-space-game-launcher
 cd the-space-game-launcher
-python3 -m http.server 8000
-open http://localhost:8000</pre>
+python3 -m http.server 8000      # or: npx serve -l 8000
+open http://localhost:8000       #     deno run -A jsr:@std/http/file-server -p 8000
+                                 #     ruby -run -e httpd . -p 8000
+                                 #     php -S localhost:8000</pre>
     </div>
   </section>
 
