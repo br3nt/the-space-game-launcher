@@ -48,7 +48,15 @@
     document.body.dataset.tab = name;
   }
   function goTab(name) { showTab(name); history.replaceState(null, '', '#' + name); }
-  $$('.tab').forEach(t => t.addEventListener('click', () => goTab(t.dataset.tab)));
+  // Tabs are real links (right-click, middle-click and cmd-click work); a plain click switches in place.
+  $$('.tab').forEach(t => t.addEventListener('click', e => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault(); goTab(t.dataset.tab);
+  }));
+  addEventListener('hashchange', () => {
+    const h = location.hash.slice(1);
+    if (document.querySelector(`.panel[data-panel="${CSS.escape(h)}"]`)) showTab(h);
+  });
   // In-text links between tabs ("See Get the files").
   document.addEventListener('click', e => {
     const a = e.target.closest('[data-goto]'); if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;

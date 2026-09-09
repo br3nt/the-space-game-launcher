@@ -14,7 +14,7 @@
 <meta property="og:image" content="https://br3nt.github.io/the-space-game-launcher/assets/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="The Space Game's main menu on the Bonus Modes tab">
+<meta property="og:image:alt" content="The Space Game in play: a base of lasers and miners with a pirate wave inbound">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="The Space Game: Launcher">
 <meta name="twitter:description" content="The Space Game and The Space Game: Missions, the 2009 Flash games by Casual Collective, playable again.">
@@ -23,7 +23,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%23ffc400' stroke-width='3' stroke-dasharray='4 4'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23ffc400'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=11">
+<link rel="stylesheet" href="style.css?v=12">
 <script src="https://unpkg.com/@ruffle-rs/ruffle@0.5.0"></script>
 </head>
 <body data-tab="play">
@@ -37,11 +37,11 @@
   </header>
 
   <nav class="tabs" aria-label="Sections">
-    <button class="tab" data-tab="play" style="--c:#2eff2e;--c2:#0b8a0b">Play</button>
-    <button class="tab" data-tab="files" style="--c:#ffc400;--c2:#a67a00">Get the files</button>
-    <button class="tab" data-tab="how" style="--c:#ff6a00;--c2:#8f3a00">How it works</button>
-    <button class="tab" data-tab="shots" style="--c:#33ccff;--c2:#0f6b8a">Screenshots</button>
-    <button class="tab" data-tab="credits" style="--c:#e6e6e6;--c2:#555">Credits</button>
+    <a class="tab" href="#play" data-tab="play" style="--c:#2eff2e;--c2:#0b8a0b">Play</a>
+    <a class="tab" href="#files" data-tab="files" style="--c:#ffc400;--c2:#a67a00">Get the files</a>
+    <a class="tab" href="#how" data-tab="how" style="--c:#ff6a00;--c2:#8f3a00">How it works</a>
+    <a class="tab" href="#shots" data-tab="shots" style="--c:#33ccff;--c2:#0f6b8a">Screenshots</a>
+    <a class="tab" href="#credits" data-tab="credits" style="--c:#e6e6e6;--c2:#555">Credits</a>
   </nav>
 
   <!-- ===== PLAY ===== -->
@@ -198,6 +198,6 @@ open http://localhost:8000       #     deno run -A jsr:@std/http/file-server -p 
   </footer>
 </main>
 
-<script src="app.js?v=15"></script>
+<script src="app.js?v=16"></script>
 </body>
 </html>

@@ -36,10 +36,11 @@ code { color: #ffe08a; }
 .tab {
   --c: var(--ink); --c2: #444;
   font: 700 18px var(--body); color: var(--c); padding: 12px 24px; cursor: pointer;
+  display: inline-block; text-decoration: none;
   background: linear-gradient(#171717, #000); border: 1px solid var(--c); border-bottom: none;
   box-shadow: inset 0 0 12px rgba(0,0,0,0.8);
 }
-.tab:hover { background: linear-gradient(#242424, #050505); }
+.tab:hover { color: var(--c); background: linear-gradient(#242424, #050505); }
 .tab.active { color: #000; background: linear-gradient(var(--c), var(--c2)); }
 .tab:last-child { margin-left: auto; }
 
