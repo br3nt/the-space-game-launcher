@@ -280,7 +280,11 @@
       if (player === mine) setStatus(`Could not load ${g.loader}: ${err.message || err}`, 100, 'error');
       return;
     }
-    if (player === mine) syncStatus(6000); // a second Launch may have replaced this player meanwhile
+    if (player !== mine) return;             // a second Launch replaced this player meanwhile
+    // Ruffle only pauses on a visibilitychange event. A game launched into a tab that is already hidden never
+    // gets one, so send it ourselves; Ruffle then notes it was playing and resumes when the tab comes back.
+    if (document.hidden) document.dispatchEvent(new Event('visibilitychange'));
+    syncStatus(6000);
   }
   $$('[data-play]').forEach(b => b.addEventListener('click', () => play(b.dataset.play)));
   $$('.tab').forEach(t => t.addEventListener('click', () => { if (t.dataset.tab === 'files') refreshSaves(); }));
