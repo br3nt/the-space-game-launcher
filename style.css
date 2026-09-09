@@ -90,7 +90,7 @@ code { color: #ffe08a; }
 .link:hover { color: #fff; }
 
 .stagebox { margin: 18px 0 14px; border: 1px solid #444; background: #000; }
-/* The stage is 700 wide by --stage-h tall (525 for Missions, 700 for The Space Game) with the widget's own
+/* The stage is 700 wide by --stage-h tall (525 for Missions, 725 for The Space Game) with the widget's own
    grey bar in the bottom 25px. Show everything above the bar; the page's bar below the stage stands in for it. */
 .stage { --stage-h: 525; width: 100%; aspect-ratio: 700 / calc(var(--stage-h) - 25); background: #000; overflow: hidden; position: relative; }
 .stage ruffle-player { width: 100%; height: calc(100% * var(--stage-h) / (var(--stage-h) - 25)); display: block; }

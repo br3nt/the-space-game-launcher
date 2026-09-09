@@ -37,9 +37,9 @@ self.addEventListener('fetch', e => {
 
 // The Space Game's own stage is 700x700: a 200px panel under the play area holds the live graphs and the
 // Sandbox wave designer. Its loader and widget say 700x525, and in 2009 the page embedded them taller, so
-// Flash showed the whole game. Ruffle sizes the stage from the root SWF's header, so the loader goes out
-// with its height corrected. The widget pins its bar to Stage.height, so it moves down with it.
-const STAGE_HEIGHT = { 'games/thespacegame.swf': 700 };
+// Flash showed the whole game with the widget's 25px bar under it. Ruffle sizes the stage from the root
+// SWF's header, so the loader goes out with its height corrected. The widget pins its bar to Stage.height.
+const STAGE_HEIGHT = { 'games/thespacegame.swf': 725 };
 
 async function handle(req) {
   const u = new URL(req.url);

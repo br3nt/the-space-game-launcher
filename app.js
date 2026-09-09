@@ -9,7 +9,7 @@
   // Flashpoint's data packs (content/storage.cloud.casualcollective.com/...).
   const GAMES = {
     thespacegame: {
-      title: 'The Space Game', gid: 10, loader: 'games/thespacegame.swf', stage: 700,   // 700x700, see sw.js
+      title: 'The Space Game', gid: 10, loader: 'games/thespacegame.swf', stage: 725,   // 700 of game + the widget's bar, see sw.js
       required: ['games/thespacegame.swf', 'zones/pub/10/widget.swf', 'zones/pub/10/thespacegame.v83.swf'],
       optional: ['zones/pub/10/thespacegamebg.swf', 'zones/pub/stingers/ccblocks.swf'],
     },
@@ -256,7 +256,12 @@
     $('#stage').appendChild(player);
     setStatus('Loading: 0%', 0, 'busy');
     clearTimeout(runningTimer);
-    player.addEventListener('loadedmetadata', () => { setStatus('Loading: 100%', 100, 'ok'); applyVolume(); });
+    player.addEventListener('loadedmetadata', () => {
+      setStatus('Loading: 100%', 100, 'ok'); applyVolume();
+      // Size the stage from what Ruffle actually loaded, so the page and the worker's loader never disagree
+      // (a cached page can outlive a worker update, or the other way round).
+      if (player.metadata && player.metadata.height) $('#stage').style.setProperty('--stage-h', player.metadata.height);
+    });
     player.scrollIntoView({ behavior: 'smooth', block: 'start' });
     try {
       await player.ruffle().load({
